@@ -250,14 +250,12 @@ def delete_venue(venue_id):
 @app.route('/artists')
 def artists():
 
-  artists = Artist.query
-
   data = [
       {
           "id": artist.id,
           "name": artist.name
       }
-      for artist in artists
+      for artist in Artist.query
   ]
 
   return render_template('pages/artists.html', artists=data)
