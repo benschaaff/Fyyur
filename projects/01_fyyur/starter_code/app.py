@@ -47,7 +47,15 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    shows = db.relationship('Show', backref='venue')
+    shows = db.relationship('Show', backref='venue', lazy='dynamic')
+
+    @property
+    def past_shows(self):
+      return format_venue_shows(self.shows.filter(Show.start_time < datetime.utcnow()))
+
+    @property
+    def upcoming_shows(self):
+      return format_venue_shows(self.shows.filter(Show.start_time >= datetime.utcnow()))
 
 
 class Artist(db.Model):
@@ -63,7 +71,15 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
     website = website = db.Column(db.String(120))
-    shows = db.relationship('Show', backref='artist')
+    shows = db.relationship('Show', backref='artist', lazy='dynamic')
+
+    @property
+    def past_shows(self):
+      return format_artist_shows(self.shows.filter(Show.start_time < datetime.utcnow()))
+
+    @property
+    def upcoming_shows(self):
+      return format_artist_shows(self.shows.filter(Show.start_time >= datetime.utcnow()))
 
 
 class Show(db.Model):
@@ -152,12 +168,13 @@ def search_venues():
 
 
 def format_venue_shows(query):
+  print(query)
   return [
       {
-          "artist_id": s.Artist.id,
-          "artist_name": s.Artist.name,
-          "artist_image_link": s.Artist.image_link,
-          "start_time": str(s.Show.start_time)
+          "artist_id": s.artist.id,
+          "artist_name": s.artist.name,
+          "artist_image_link": s.artist.image_link,
+          "start_time": str(s.start_time)
       }
       for s in query
   ]
@@ -165,10 +182,10 @@ def format_venue_shows(query):
 def format_artist_shows(query):
   return [
       {
-          "venue_id": s.Venue.id,
-          "venue_name": s.Venue.name,
-          "venue_image_link": s.Venue.image_link,
-          "start_time": str(s.Show.start_time)
+          "venue_id": s.venue.id,
+          "venue_name": s.venue.name,
+          "venue_image_link": s.venue.image_link,
+          "start_time": str(s.start_time)
       }
       for s in query
   ]
@@ -176,13 +193,8 @@ def format_artist_shows(query):
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   venue = Venue.query.get(venue_id)
-  show_query = db.session.query(Show, Artist).filter(Show.venue_id == venue_id,
-                                                     Show.artist_id == Artist.id)
-  past_show_query = show_query.filter(Show.start_time < datetime.utcnow())
-  upcoming_show_query = show_query.filter(Show.start_time >= datetime.utcnow())
-
-  past_shows = format_venue_shows(past_show_query)
-  upcoming_shows = format_venue_shows(upcoming_show_query)
+  past_shows = venue.past_shows
+  upcoming_shows = venue.upcoming_shows
 
   data = {
     "id": venue_id,
@@ -268,13 +280,8 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   artist = Artist.query.get(artist_id)
-  show_query = db.session.query(Show, Venue).filter(Show.artist_id == artist_id,
-                                                     Show.venue_id == Venue.id)
-  past_show_query = show_query.filter(Show.start_time < datetime.utcnow())
-  upcoming_show_query = show_query.filter(Show.start_time >= datetime.utcnow())
-
-  past_shows = format_artist_shows(past_show_query)
-  upcoming_shows = format_artist_shows(upcoming_show_query)
+  past_shows = artist.past_shows
+  upcoming_shows = artist.upcoming_shows
 
   data = {
     "id": artist_id,
