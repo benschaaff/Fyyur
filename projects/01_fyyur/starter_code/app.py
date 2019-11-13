@@ -348,7 +348,7 @@ def edit_artist(artist_id):
     "website": artist.website,
     "facebook_link": artist.facebook_link,
     "seeking_venue": artist.seeking_venue,
-    # "seeking_description": artist.seeking_description,
+    "seeking_description": artist.seeking_description,
     "image_link": artist.image_link
   }
   return render_template('forms/edit_artist.html', form=form, artist=data)
