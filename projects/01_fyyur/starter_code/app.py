@@ -71,6 +71,7 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String)
     website = website = db.Column(db.String(120))
     shows = db.relationship('Show', backref='artist', lazy='dynamic')
 
