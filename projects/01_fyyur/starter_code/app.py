@@ -251,7 +251,6 @@ def create_venue_submission():
     db.session.add(venue)
     db.session.commit()
     message = f'Venue {venue.name} was successfully listed!', 'info'
-    blarg
   except:
     db.session.rollback()
     message = f'An error occurred. Venue {venue.name} could not be listed.', 'danger'
@@ -339,7 +338,7 @@ def edit_artist(artist_id):
   form = ArtistForm()
 
   data = {
-    "id": artist_id,
+    "id": artist.id,
     "name": artist.name,
     "genres": json.loads(artist.genres),
     "city": artist.city,
@@ -351,6 +350,7 @@ def edit_artist(artist_id):
     "seeking_description": artist.seeking_description,
     "image_link": artist.image_link
   }
+
   return render_template('forms/edit_artist.html', form=form, artist=data)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
@@ -362,23 +362,25 @@ def edit_artist_submission(artist_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
+  venue = Venue.query.get(venue_id)
   form = VenueForm()
-  venue={
-    "id": 1,
-    "name": "The Musical Hop",
-    "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-    "address": "1015 Folsom Street",
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "123-123-1234",
-    "website": "https://www.themusicalhop.com",
-    "facebook_link": "https://www.facebook.com/TheMusicalHop",
-    "seeking_talent": True,
-    "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-    "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
+
+  data = {
+    "id": venue.id,
+    "name": venue.name,
+    "genres": json.loads(venue.genres),
+    "address": venue.address,
+    "city": venue.city,
+    "state": venue.state,
+    "phone": venue.phone,
+    "website": venue.website,
+    "facebook_link": venue.facebook_link,
+    "seeking_talent": venue.seeking_talent,
+    "seeking_description": venue.seeking_description,
+    "image_link": venue.image_link
   }
-  # TODO: populate form with values from venue with ID <venue_id>
-  return render_template('forms/edit_venue.html', form=form, venue=venue)
+
+  return render_template('forms/edit_venue.html', form=form, venue=data)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
@@ -396,14 +398,27 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  form = request.form
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+  #TODO(ben): add website
+  artist = Artist(name=form['name'],
+                  genres=json.dumps(form.getlist('genres')),
+                  city=form['city'],
+                  state=form['state'],
+                  phone=form['phone'],
+                  facebook_link=form['facebook_link'])
+
+  #TODO(ben): maybe refactor this
+  try:
+    db.session.add(artist)
+    db.session.commit()
+    message = f'Artist {artist.name} was successfully listed!', 'info'
+  except:
+    db.session.rollback()
+    message = f'An error occurred. Artist {artist.name} could not be listed.', 'danger'
+
+  flash(*message)
+
   return render_template('pages/home.html')
 
 
