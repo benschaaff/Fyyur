@@ -523,7 +523,6 @@ def create_show_submission():
                 venue_id=form['venue_id'],
                 start_time=form['start_time'])
 
-    # TODO(ben): maybe refactor this
     try:
         db.session.add(show)
         db.session.commit()

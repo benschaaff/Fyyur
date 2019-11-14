@@ -4,7 +4,7 @@ from enum import Enum
 import us
 from flask_wtf import FlaskForm
 from wtforms import (DateTimeField, SelectField, SelectMultipleField,
-                     StringField)
+                     StringField, BooleanField)
 from wtforms.validators import URL, AnyOf, DataRequired, ValidationError
 import re
 
@@ -48,31 +48,44 @@ def validate_phone(form, field):
 
 
 class VenueForm(FlaskForm):
+    # Required Fields
     name = StringField('name', validators=[DataRequired()])
     city = StringField('city', validators=[DataRequired()])
     state = SelectField(
         'state', validators=[DataRequired()],
         choices=[(state.abbr, state.abbr) for state in us.states.STATES])
     address = StringField('address', validators=[DataRequired()])
-    phone = StringField('phone')
-    image_link = StringField('image_link')
     genres = SelectMultipleField('genres', validators=[DataRequired()],
                                  choices=[(g.value, g.value) for g in Genre])
-    facebook_link = StringField('facebook_link', validators=[URL()])
-    website = StringField('website', validators=[URL()])
+    seeking_talent = BooleanField(
+        'seeking_talent', validators=[DataRequired()])
+    email = StringField('email', validators=[DataRequired()])
+
+    # Optional Fields
+    phone = StringField('phone')
+    image_link = StringField('image_link')
+    facebook_link = StringField('facebook_link')
+    website = StringField('website')
+    seeking_description = StringField('seeking_description')
 
 
 class ArtistForm(FlaskForm):
+    # Required Fields
     name = StringField('name', validators=[DataRequired()])
     city = StringField('city', validators=[DataRequired()])
     state = SelectField(
         'state', validators=[DataRequired()],
         choices=[(state.abbr, state.abbr) for state in us.states.STATES])
-    phone = StringField('phone')
-    image_link = StringField('image_link')
     genres = SelectMultipleField('genres', validators=[DataRequired()],
                                  choices=[(g.value, g.value) for g in Genre])
-    facebook_link = StringField('facebook_link', validators=[URL()])
-    website = StringField('website', validators=[URL()])
+    seeking_venue = BooleanField('seeking_venue', validators=[DataRequired()])
+    email = StringField('email', validators=[DataRequired()])
+
+    # Optional Fields
+    phone = StringField('phone')
+    image_link = StringField('image_link')
+    facebook_link = StringField('facebook_link')
+    website = StringField('website')
+    seeking_description = StringField('seeking_description')
 
 # TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
