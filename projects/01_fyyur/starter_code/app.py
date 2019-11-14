@@ -238,14 +238,14 @@ def create_venue_form():
 def create_venue_submission():
   form = request.form
 
-  #TODO(ben): add website
   venue = Venue(name=form['name'],
                 genres=json.dumps(form.getlist('genres')),
                 city=form['city'],
                 state=form['state'],
                 address=form['address'],
                 phone=form['phone'],
-                facebook_link=form['facebook_link'])
+                facebook_link=form['facebook_link'],
+                website=form['website'])
 
   try:
     db.session.add(venue)
@@ -364,8 +364,28 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
+  artist = Artist.query.get(artist_id)
+  form = request.form
+  try:
+    artist.name = form['name']
+    artist.genres = json.dumps(form.getlist('genres'))
+    artist.city = form['city']
+    artist.state = form['state']
+    artist.phone = form['phone']
+    artist.website = form['website']
+    artist.facebook_link = form['facebook_link']
+    artist.seeking_venue = form.get('seeking_venue')
+    artist.seeking_description = form.get('seeking_description')
+    artist.image_link = form.get('image_link')
+
+    db.session.commit()
+    message = f'Artist ID {artist.id} was updated!', 'info'
+  except Exception as e:
+    print(e)
+    db.session.rollback()
+    message = f'An error occurred. Changes not saved :(', 'danger'
+
+  flash(*message)
 
   return redirect(url_for('show_artist', artist_id=artist_id))
 
@@ -393,8 +413,29 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
-  # venue record with ID <venue_id> using the new attributes
+  venue = Venue.query.get(venue_id)
+  form = request.form
+  try:
+    venue.name = form['name']
+    venue.genres = json.dumps(form.getlist('genres'))
+    venue.city = form['city']
+    venue.state = form['state']
+    venue.phone = form['phone']
+    venue.website = form['website']
+    venue.facebook_link = form['facebook_link']
+    venue.seeking_talent = form.get('seeking_talent')
+    venue.seeking_description = form.get('seeking_description')
+    venue.image_link = form.get('image_link')
+
+    db.session.commit()
+    message = f'Venue ID {venue.id} was updated!', 'info'
+  except Exception as e:
+    print(e)
+    db.session.rollback()
+    message = f'An error occurred. Changes not saved :(', 'danger'
+
+  flash(*message)
+
   return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
