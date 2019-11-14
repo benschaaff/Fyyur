@@ -23,7 +23,7 @@ class Genre(Enum):
     MUSICAL_THEATRE = 'Musical Theatre'
     POP = 'Pop'
     PUNK = 'Punk'
-    R_AND_B = 'R&B'
+    R_&_B = 'R&B'
     REGGAE = 'Reggae'
     ROCK_N_ROLL = 'Rock n Roll'
     SOUL = 'Soul'
@@ -40,8 +40,9 @@ class ShowForm(FlaskForm):
 class VenueForm(FlaskForm):
     name = StringField('name', validators=[DataRequired()])
     city = StringField('city', validators=[DataRequired()])
-    state = SelectField('state', validators=[DataRequired()],
-                        choices=[state.abbr for state in us.states.STATES])
+    state = SelectField(
+        'state', validators=[DataRequired()],
+        choices=[(state.abbr, state.abbr) for state in us.states.STATES])
     address = StringField('address', validators=[DataRequired()])
     phone = StringField('phone')
     image_link = StringField('image_link')
@@ -54,8 +55,9 @@ class VenueForm(FlaskForm):
 class ArtistForm(FlaskForm):
     name = StringField('name', validators=[DataRequired()])
     city = StringField('city', validators=[DataRequired()])
-    state = SelectField('state', validators=[DataRequired()],
-                        choices=[state.abbr for state in us.states.STATES])
+    state = SelectField(
+        'state', validators=[DataRequired()],
+        choices=[(state.abbr, state.abbr) for state in us.states.STATES])
     phone = StringField('phone')
     image_link = StringField('image_link')
     genres = SelectMultipleField('genres', validators=[DataRequired()],
