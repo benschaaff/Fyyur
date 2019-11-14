@@ -17,8 +17,8 @@ import babel
 import dateutil.parser
 from flask_migrate import Migrate
 from flask_moment import Moment
-from flask_wtf import Form
 from forms import *
+
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -240,36 +240,33 @@ def show_venue(venue_id):
 #  ----------------------------------------------------------------
 
 
-@app.route('/venues/create', methods=['GET'])
-def create_venue_form():
-    form = VenueForm()
+@app.route('/venues/create', methods=['GET', 'POST'])
+def create_venue():
+    form = VenueForm(request.form)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            venue = Venue(name=form.name.data,
+                          genres=json.dumps(form.genres.data),
+                          city=form.city.data,
+                          state=form.state.data,
+                          address=form.address.data,
+                          phone=form.phone.data,
+                          facebook_link=form.facebook_link.data,
+                          website=form.website.data)
+            try:
+                db.session.add(venue)
+                db.session.commit()
+                message = f'Venue {venue.name} was successfully listed!', 'info'
+            except:
+                db.session.rollback()
+                message = f'An error occurred. Venue {venue.name} could not be listed.', 'danger'
+            flash(*message)
+            return redirect(url_for('index'))
+        else:
+            errors = form.errors
+            for e in errors:
+                flash(f'{e}: {errors[e][0]}', 'danger')
     return render_template('forms/new_venue.html', form=form)
-
-
-@app.route('/venues/create', methods=['POST'])
-def create_venue_submission():
-    form = request.form
-
-    venue = Venue(name=form['name'],
-                  genres=json.dumps(form.getlist('genres')),
-                  city=form['city'],
-                  state=form['state'],
-                  address=form['address'],
-                  phone=form['phone'],
-                  facebook_link=form['facebook_link'],
-                  website=form['website'])
-
-    try:
-        db.session.add(venue)
-        db.session.commit()
-        message = f'Venue {venue.name} was successfully listed!', 'info'
-    except:
-        db.session.rollback()
-        message = f'An error occurred. Venue {venue.name} could not be listed.', 'danger'
-
-    flash(*message)
-
-    return render_template('pages/home.html')
 
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
@@ -459,36 +456,33 @@ def edit_venue_submission(venue_id):
 #  ----------------------------------------------------------------
 
 
-@app.route('/artists/create', methods=['GET'])
-def create_artist_form():
-    form = ArtistForm()
+@app.route('/artists/create', methods=['GET', 'POST'])
+def create_artist():
+    form = ArtistForm(request.form)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            artist = Artist(name=form.name.data,
+                            genres=json.dumps(form.genres.data),
+                            city=form.city.data,
+                            state=form.state.data,
+                            phone=form.phone.data,
+                            facebook_link=form.facebook_link.data,
+                            website=form.website.data)
+            try:
+                db.session.add(artist)
+                db.session.commit()
+                message = f'Artist {artist.name} was successfully listed!', 'info'
+            except:
+                db.session.rollback()
+                message = f'An error occurred. Artist {artist.name} could not be listed.', 'danger'
+
+            flash(*message)
+            return redirect(url_for('index'))
+        else:
+            errors = form.errors
+            for e in errors:
+                flash(f'{e}: {errors[e][0]}', 'danger')
     return render_template('forms/new_artist.html', form=form)
-
-
-@app.route('/artists/create', methods=['POST'])
-def create_artist_submission():
-    form = request.form
-
-    artist = Artist(name=form['name'],
-                    genres=json.dumps(form.getlist('genres')),
-                    city=form['city'],
-                    state=form['state'],
-                    phone=form['phone'],
-                    facebook_link=form['facebook_link'],
-                    website=form['website'])
-
-    # TODO(ben): maybe refactor this
-    try:
-        db.session.add(artist)
-        db.session.commit()
-        message = f'Artist {artist.name} was successfully listed!', 'info'
-    except:
-        db.session.rollback()
-        message = f'An error occurred. Artist {artist.name} could not be listed.', 'danger'
-
-    flash(*message)
-
-    return render_template('pages/home.html')
 
 
 #  Shows

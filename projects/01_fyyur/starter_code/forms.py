@@ -5,7 +5,8 @@ import us
 from flask_wtf import FlaskForm
 from wtforms import (DateTimeField, SelectField, SelectMultipleField,
                      StringField)
-from wtforms.validators import URL, AnyOf, DataRequired
+from wtforms.validators import URL, AnyOf, DataRequired, ValidationError
+import re
 
 
 class Genre(Enum):
@@ -23,7 +24,7 @@ class Genre(Enum):
     MUSICAL_THEATRE = 'Musical Theatre'
     POP = 'Pop'
     PUNK = 'Punk'
-    R_&_B = 'R&B'
+    R_AND_B = 'R&B'
     REGGAE = 'Reggae'
     ROCK_N_ROLL = 'Rock n Roll'
     SOUL = 'Soul'
@@ -35,6 +36,15 @@ class ShowForm(FlaskForm):
     venue_id = StringField('venue_id')
     start_time = DateTimeField('start_time', validators=[DataRequired()],
                                default=datetime.today())
+
+
+def validate_phone(form, field):
+    phone_number = field.data
+    if not phone_number:
+        return
+    valid = re.search('^[0-9]{10}$', phone_number)
+    if not valid:
+        raise ValidationError('Please enter a valid U.S. phone number.')
 
 
 class VenueForm(FlaskForm):
