@@ -6,6 +6,7 @@ import json
 import logging
 import re
 from logging import FileHandler, Formatter
+from typing import Dict, List
 
 from flask import (Flask, Response, flash, redirect, render_template, request,
                    url_for)
@@ -48,15 +49,31 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+
     shows = db.relationship('Show', backref='venue', lazy='dynamic')
 
-    @property
-    def past_shows(self):
-      return format_venue_shows(self.shows.filter(Show.start_time < datetime.utcnow()))
+    @staticmethod
+    def _format_shows(shows: List['Show']) -> List[Dict]:
+      return [
+          {
+              "artist_id": show.artist.id,
+              "artist_name": show.artist.name,
+              "artist_image_link": show.artist.image_link,
+              "start_time": str(show.start_time)
+          }
+          for show in shows
+      ]
 
     @property
-    def upcoming_shows(self):
-      return format_venue_shows(self.shows.filter(Show.start_time >= datetime.utcnow()))
+    def past_shows(self) -> List[Dict]:
+      shows = self.shows.filter(Show.start_time < datetime.utcnow()).all()
+      return self._format_shows(shows)
+
+
+    @property
+    def upcoming_shows(self) -> List[Dict]:
+      shows = self.shows.filter(Show.start_time >= datetime.utcnow()).all()
+      return self._format_shows(shows)
 
 
 class Artist(db.Model):
@@ -75,13 +92,27 @@ class Artist(db.Model):
     website = website = db.Column(db.String(120))
     shows = db.relationship('Show', backref='artist', lazy='dynamic')
 
-    @property
-    def past_shows(self):
-      return format_artist_shows(self.shows.filter(Show.start_time < datetime.utcnow()))
+    @staticmethod
+    def _format_shows(shows: List['Show']) -> List[Dict]:
+      return [
+          {
+              "venue_id": show.venue.id,
+              "venue_name": show.venue.name,
+              "venue_image_link": show.venue.image_link,
+              "start_time": str(show.start_time)
+          }
+          for show in shows
+      ]
 
     @property
-    def upcoming_shows(self):
-      return format_artist_shows(self.shows.filter(Show.start_time >= datetime.utcnow()))
+    def past_shows(self) -> List[Dict]:
+      shows = self.shows.filter(Show.start_time < datetime.utcnow())
+      return self._format_shows(shows)
+
+    @property
+    def upcoming_shows(self) -> List[Dict]:
+      shows = self.shows.filter(Show.start_time >= datetime.utcnow())
+      return self._format_shows(shows)
 
 
 class Show(db.Model):
@@ -174,31 +205,6 @@ def search_venues():
 
   return render_template('pages/search_venues.html', results=response, search_term=search_term)
 
-#####################################################
-#TODO(ben): this can be cleaner; refactor
-def format_venue_shows(query):
-  print(query)
-  return [
-      {
-          "artist_id": s.artist.id,
-          "artist_name": s.artist.name,
-          "artist_image_link": s.artist.image_link,
-          "start_time": str(s.start_time)
-      }
-      for s in query
-  ]
-
-def format_artist_shows(query):
-  return [
-      {
-          "venue_id": s.venue.id,
-          "venue_name": s.venue.name,
-          "venue_image_link": s.venue.image_link,
-          "start_time": str(s.start_time)
-      }
-      for s in query
-  ]
-#####################################################
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
