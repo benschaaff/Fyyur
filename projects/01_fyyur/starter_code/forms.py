@@ -57,11 +57,10 @@ class VenueForm(FlaskForm):
     address = StringField('address', validators=[DataRequired()])
     genres = SelectMultipleField('genres', validators=[DataRequired()],
                                  choices=[(g.value, g.value) for g in Genre])
-    seeking_talent = BooleanField(
-        'seeking_talent', validators=[DataRequired()])
     email = StringField('email', validators=[DataRequired()])
 
     # Optional Fields
+    seeking_talent = BooleanField('seeking_talent')
     phone = StringField('phone')
     image_link = StringField('image_link')
     facebook_link = StringField('facebook_link')
