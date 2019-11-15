@@ -78,10 +78,10 @@ class ArtistForm(FlaskForm):
         choices=[(state.abbr, state.abbr) for state in us.states.STATES])
     genres = SelectMultipleField('genres', validators=[DataRequired()],
                                  choices=[(g.value, g.value) for g in Genre])
-    seeking_venue = BooleanField('seeking_venue', validators=[DataRequired()])
     email = StringField('email', validators=[DataRequired()])
 
     # Optional Fields
+    seeking_venue = BooleanField('seeking_venue')
     phone = StringField('phone')
     image_link = StringField('image_link')
     facebook_link = StringField('facebook_link')

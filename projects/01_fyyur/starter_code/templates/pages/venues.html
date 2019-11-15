@@ -1,8 +1,12 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Fyyur | Venues{% endblock %}
 {% block content %}
+<div>
+	<a href="/venues/create"><button class="btn btn-primary btn-lg">Post a venue</button></a>
+</div>
 {% for area in areas %}
-<h3>{{ area.city }}, {{ area.state }}</h3>
+<div>
+	<h3>{{ area.city }}, {{ area.state }}</h3>
 	<ul class="items">
 		{% for venue in area.venues %}
 		<li>
@@ -15,5 +19,6 @@
 		</li>
 		{% endfor %}
 	</ul>
+</div>
 {% endfor %}
 {% endblock %}

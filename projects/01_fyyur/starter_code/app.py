@@ -52,7 +52,8 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     email = db.Column(db.String(120))
 
-    shows = db.relationship('Show', backref='venue', lazy='dynamic', passive_deletes=True)
+    shows = db.relationship('Show', backref='venue',
+                            lazy='dynamic', passive_deletes=True)
 
     @staticmethod
     def _format_shows(shows: List['Show']) -> List[Dict]:
@@ -92,7 +93,8 @@ class Artist(db.Model):
     seeking_description = db.Column(db.String)
     website = website = db.Column(db.String(120))
     email = db.Column(db.String(120))
-    shows = db.relationship('Show', backref='artist', lazy='dynamic', passive_deletes=True)
+    shows = db.relationship('Show', backref='artist', lazy='dynamic',
+                            cascade='all, delete-orphan', passive_deletes=True)
 
     @staticmethod
     def _format_shows(shows: List['Show']) -> List[Dict]:
@@ -121,12 +123,12 @@ class Show(db.Model):
     __tablename__ = 'Show'
 
     id = db.Column(db.Integer, primary_key=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id', ondelete='CASCADE'))
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id', ondelete='CASCADE'))
+    artist_id = db.Column(db.Integer, db.ForeignKey(
+        'Artist.id', ondelete='CASCADE'))
+    venue_id = db.Column(db.Integer, db.ForeignKey(
+        'Venue.id', ondelete='CASCADE'))
     start_time = db.Column(db.DateTime)
 
-    venue = db.relationship('Venue', backref='shows', lazy='dynamic', cascade='all')
-    artist = db.relationship('Artist', backref='shows', lazy='dynamic', cascade='all')
 
     def __repr__(self):
         return (
@@ -357,6 +359,8 @@ def show_artist(artist_id):
 
 #  Update
 #  ----------------------------------------------------------------
+
+#TODO(ben): combine the edit artist functions into a single function
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
     artist = Artist.query.get(artist_id)
