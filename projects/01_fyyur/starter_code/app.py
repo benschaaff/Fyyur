@@ -527,7 +527,8 @@ def create_show_submission():
         db.session.add(show)
         db.session.commit()
         message = f'Show: artist {show.artist_id} at venue {show.venue_id} was successfully listed!', 'info'
-    except:
+    except Exception as e:
+        app.logger.error(e)
         db.session.rollback()
         message = f'An error occurred. Show: artist {show.artist_id} at venue {show.venue_id} could not be listed.', 'danger'
 
