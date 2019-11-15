@@ -50,6 +50,7 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    email = db.Column(db.String(120))
 
     shows = db.relationship('Show', backref='venue', lazy='dynamic')
 
@@ -91,6 +92,7 @@ class Artist(db.Model):
     seeking_description = db.Column(db.String)
     website = website = db.Column(db.String(120))
     shows = db.relationship('Show', backref='artist', lazy='dynamic')
+    email = db.Column(db.String(120))
 
     @staticmethod
     def _format_shows(shows: List['Show']) -> List[Dict]:
