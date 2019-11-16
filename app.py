@@ -6,21 +6,17 @@ import json
 import logging
 import re
 from logging import FileHandler, Formatter
-from typing import Dict, List
-
-from flask import (Flask, Response, flash, redirect, render_template, request,
-                   url_for, make_response, abort, jsonify)
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, or_
 
 import babel
 import dateutil.parser
-from flask_migrate import Migrate
-from flask_moment import Moment
-from forms import *
-from models import db, app, Artist, Show, Venue
+from flask import (Flask, Response, abort, flash, jsonify, make_response,
+                   redirect, render_template, request, url_for)
+from sqlalchemy import func, or_
 
-# TODO: update readme and clean up all imports
+from forms import *
+from models import Artist, Show, Venue, app, db
+
+# TODO: update readme
 
 #----------------------------------------------------------------------------#
 # Filters.

@@ -1,12 +1,12 @@
+import re
 from datetime import datetime
 from enum import Enum
 
 import us
 from flask_wtf import FlaskForm
-from wtforms import (DateTimeField, SelectField, SelectMultipleField,
-                     StringField, BooleanField, TextAreaField)
+from wtforms import (BooleanField, DateTimeField, SelectField,
+                     SelectMultipleField, StringField, TextAreaField)
 from wtforms.validators import URL, AnyOf, DataRequired, ValidationError
-import re
 
 
 class Genre(Enum):
