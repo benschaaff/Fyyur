@@ -238,10 +238,12 @@ def show_venue(venue_id):
             "seeking_talent": venue.seeking_talent,
             "seeking_description": venue.seeking_description,
             "image_link": venue.image_link,
+            "email": venue.email,
             "past_shows": past_shows,
             "upcoming_shows": upcoming_shows,
             "past_shows_count": len(past_shows),
             "upcoming_shows_count": len(upcoming_shows),
+
         }
 
         return render_template('pages/show_venue.html', venue=data)

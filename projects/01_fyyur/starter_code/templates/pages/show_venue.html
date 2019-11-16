@@ -50,6 +50,9 @@
 			<i class="fas fa-phone-alt"></i> {% if venue.phone %}{{ venue.phone }}{% else %}No Phone{% endif %}
 		</p>
 		<p>
+			<i class="fas fa-envelope"></i>{{ venue.email }}
+		</p>
+		<p>
 			<i class="fas fa-link"></i> {% if venue.website %}<a href="{{ venue.website }}"
 				target="_blank">{{ venue.website }}</a>{% else %}No Website{% endif %}
 		</p>
