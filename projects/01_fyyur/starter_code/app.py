@@ -275,7 +275,9 @@ def create_venue():
                           phone=form.phone.data,
                           facebook_link=form.facebook_link.data,
                           website=form.website.data,
-                          seeking_talent=form.seeking_talent.data)
+                          seeking_talent=form.seeking_talent.data,
+                          seeking_description=form.seeking_description.data,
+                          email=form.email.data)
             try:
                 db.session.add(venue)
                 db.session.commit()
@@ -485,7 +487,11 @@ def create_artist():
                             state=form.state.data,
                             phone=form.phone.data,
                             facebook_link=form.facebook_link.data,
-                            website=form.website.data)
+                            website=form.website.data,
+                            seeking_venue=form.seeking_venue.data,
+                            seeking_description=form.seeking_description.data,
+                            email=form.email.data,
+                            image_link=form.image_link.data)
             try:
                 db.session.add(artist)
                 db.session.commit()
@@ -593,7 +599,3 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 '''
-
-
-# TODO(ben): fix image link issue (reading 'none' from the db)
-# TODO(ben): handle email
