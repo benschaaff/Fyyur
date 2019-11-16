@@ -222,7 +222,7 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-     """Update the venue info using the form."""
+    """Update the venue info using the form."""
 
     venue = Venue.query.get(venue_id)
     form = VenueForm(request.form)
