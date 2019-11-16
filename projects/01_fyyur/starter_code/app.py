@@ -9,7 +9,7 @@ from logging import FileHandler, Formatter
 from typing import Dict, List
 
 from flask import (Flask, Response, flash, redirect, render_template, request,
-                   url_for, make_response, abort)
+                   url_for, make_response, abort, jsonify)
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, or_
 
@@ -154,7 +154,7 @@ app.jinja_env.filters['datetime'] = format_datetime
 #----------------------------------------------------------------------------#
 
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     return render_template('pages/home.html')
 
@@ -200,7 +200,6 @@ def venues():
 def search_venues():
     search_term = request.form.get('search_term', '')
     venues = Venue.query.filter(Venue.name.ilike(f'%{search_term}%'))
-
     data = [
         {
             "id": venue.id,
@@ -218,7 +217,7 @@ def search_venues():
     return render_template('pages/search_venues.html', results=response, search_term=search_term)
 
 
-@app.route('/venues/<int:venue_id>')
+@app.route('/venues/<int:venue_id>', methods=['GET'])
 def show_venue(venue_id):
     venue = Venue.query.get(venue_id)
     if venue:
@@ -236,6 +235,7 @@ def show_venue(venue_id):
             "website": venue.website,
             "facebook_link": venue.facebook_link,
             "seeking_talent": venue.seeking_talent,
+            "seeking_description": venue.seeking_description,
             "image_link": venue.image_link,
             "past_shows": past_shows,
             "upcoming_shows": upcoming_shows,
@@ -247,8 +247,19 @@ def show_venue(venue_id):
 
     abort(404)
 
-#  Create Venue
-#  ----------------------------------------------------------------
+
+@app.route('/venues/<int:venue_id>', methods=['DELETE'])
+def delete_venue(venue_id):
+    venue = Venue.query.get(venue_id)
+    try:
+        db.session.delete(venue)
+        db.session.commit()
+        message = f'Venue {venue.name} was successfully deleted!', 'info'
+    except:
+        db.session.rollback()
+        message = f'An error occurred. Venue {venue.name} could not be deleted.', 'danger'
+    flash(*message)
+    return jsonify({'redirect': '/'})
 
 
 @app.route('/venues/create', methods=['GET', 'POST'])
@@ -282,26 +293,62 @@ def create_venue():
     return render_template('forms/new_venue.html', form=form)
 
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
-def delete_venue(venue_id):
+@app.route('/venues/<int:venue_id>/edit', methods=['GET'])
+def edit_venue(venue_id):
     venue = Venue.query.get(venue_id)
+    form = VenueForm()
 
+    data = {
+        "id": venue.id,
+        "name": venue.name,
+        "genres": json.loads(venue.genres),
+        "address": venue.address,
+        "city": venue.city,
+        "state": venue.state,
+        "phone": venue.phone,
+        "website": venue.website,
+        "facebook_link": venue.facebook_link,
+        "seeking_talent": venue.seeking_talent,
+        "seeking_description": venue.seeking_description,
+        "image_link": venue.image_link,
+        "email": venue.email
+    }
+
+    return render_template('forms/edit_venue.html', form=form, venue=data)
+
+
+@app.route('/venues/<int:venue_id>/edit', methods=['POST'])
+def edit_venue_submission(venue_id):
+    venue = Venue.query.get(venue_id)
+    form = VenueForm(request.form)
     try:
-        db.session.delete(venue)
+        venue.name = form.name.data
+        venue.genres = json.dumps(form.genres.data)
+        venue.city = form.city.data
+        venue.state = form.state.data
+        venue.phone = form.phone.data
+        venue.website = form.website.data
+        venue.facebook_link = form.facebook_link.data
+        venue.seeking_talent = form.seeking_talent.data
+        venue.seeking_description = form.seeking_description.data
+        venue.image_link = form.image_link.data
+        venue.email = form.email.data
+
         db.session.commit()
-        message = f'Venue {venue.name} was successfully deleted!', 'info'
-    except:
+        message = f'Venue ID {venue.id} was updated!', 'info'
+    except Exception as e:
+        app.logger.error(e)
         db.session.rollback()
-        message = f'An error occurred. Venue {venue.name} could not be deleted.', 'danger'
+        message = f'An error occurred. Changes not saved :(', 'danger'
 
     flash(*message)
 
-    # TODO: BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-    # clicking that button delete it from the db then redirect the user to the homepage
-    return None
+    return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Artists
 #  ----------------------------------------------------------------
+
+
 @app.route('/artists')
 def artists():
 
@@ -355,11 +402,13 @@ def show_artist(artist_id):
             "website": artist.website,
             "facebook_link": artist.facebook_link,
             "seeking_venue": artist.seeking_venue,
+            "seeking_description": artist.seeking_description,
             "image_link": artist.image_link,
             "past_shows": past_shows,
             "upcoming_shows": upcoming_shows,
             "past_shows_count": len(past_shows),
-            "upcoming_shows_count": len(upcoming_shows)
+            "upcoming_shows_count": len(upcoming_shows),
+            "email": artist.email
         }
 
         return render_template('pages/show_artist.html', artist=data)
@@ -385,7 +434,8 @@ def edit_artist(artist_id):
         "facebook_link": artist.facebook_link,
         "seeking_venue": artist.seeking_venue,
         "seeking_description": artist.seeking_description,
-        "image_link": artist.image_link
+        "image_link": artist.image_link,
+        "email": artist.email
     }
 
     return render_template('forms/edit_artist.html', form=form, artist=data)
@@ -404,8 +454,9 @@ def edit_artist_submission(artist_id):
         artist.website = form.website.data
         artist.facebook_link = form.facebook_link.data
         artist.seeking_venue = form.seeking_venue.data
-        # artist.seeking_description = form.get('seeking_description')
+        artist.seeking_description = form.seeking_description.data
         artist.image_link = form.image_link.data
+        artist.email = form.email.data
 
         db.session.commit()
         message = f'Artist ID {artist.id} was updated!', 'info'
@@ -418,56 +469,6 @@ def edit_artist_submission(artist_id):
 
     return redirect(url_for('show_artist', artist_id=artist_id))
 
-
-@app.route('/venues/<int:venue_id>/edit', methods=['GET'])
-def edit_venue(venue_id):
-    venue = Venue.query.get(venue_id)
-    form = VenueForm()
-
-    data = {
-        "id": venue.id,
-        "name": venue.name,
-        "genres": json.loads(venue.genres),
-        "address": venue.address,
-        "city": venue.city,
-        "state": venue.state,
-        "phone": venue.phone,
-        "website": venue.website,
-        "facebook_link": venue.facebook_link,
-        "seeking_talent": venue.seeking_talent,
-        "seeking_description": venue.seeking_description,
-        "image_link": venue.image_link
-    }
-
-    return render_template('forms/edit_venue.html', form=form, venue=data)
-
-
-@app.route('/venues/<int:venue_id>/edit', methods=['POST'])
-def edit_venue_submission(venue_id):
-    venue = Venue.query.get(venue_id)
-    form = VenueForm(request.form)
-    try:
-        venue.name = form.name.data
-        venue.genres = json.dumps(form.genres.data)
-        venue.city = form.city.data
-        venue.state = form.state.data
-        venue.phone = form.phone.data
-        venue.website = form.website.data
-        venue.facebook_link = form.facebook_link.data
-        venue.seeking_talent = form.seeking_talent.data
-        # venue.seeking_description = form.get('seeking_description')
-        venue.image_link = form.image_link.data
-
-        db.session.commit()
-        message = f'Venue ID {venue.id} was updated!', 'info'
-    except Exception as e:
-        app.logger.error(e)
-        db.session.rollback()
-        message = f'An error occurred. Changes not saved :(', 'danger'
-
-    flash(*message)
-
-    return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
 #  ----------------------------------------------------------------
@@ -554,6 +555,9 @@ def create_show_submission():
     return render_template('pages/home.html')
 
 
+#  Error Handlers
+#  ----------------------------------------------------------------
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('errors/404.html'), 404
@@ -589,3 +593,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 '''
+
+
+# TODO(ben): fix image link issue (reading 'none' from the db)
+# TODO(ben): handle email

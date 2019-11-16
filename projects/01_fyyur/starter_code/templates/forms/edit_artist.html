@@ -39,12 +39,26 @@
       {{ form.website(class_ = 'form-control', placeholder='http://', autofocus = true, value = artist.website) }}
     </div>
     <div class="form-group">
+      <label for="email">Email</label>
+      {{ form.email(class_ = 'form-control', autofocus = true, value = artist.email) }}
+    </div>
+    <div class="form-group">
       <label for="seeking_venue">Seeking Venues</label>
-      {{ form.seeking_venue(class_ = 'form-control', autofocus = true, checked = artist.seeking_venue) }}
+      {{ form.seeking_venue(class_ = 'form-control no-border', autofocus = false, checked = artist.seeking_venue) }}
+    </div>
+    <div class="form-group">
+      <label for="seeking_description">Seeking Description</label>
+      {% set z = form.seeking_description.process_data(artist.seeking_description) %}
+      {{ form.seeking_description(class_ = 'form-control', autofocus = true) }}
     </div>
     <div class="form-group">
       <label for="image_link">Image Link</label>
-      {{ form.image_link(class_ = 'form-control', placeholder='http://', autofocus = true, value = artist.image_link) }}
+      {% if artist.image_link %}
+      {% set image_link = artist.image_link %}
+      {% else %}
+      {% set image_link = '' %}
+      {% endif %}
+      {{ form.image_link(class_ = 'form-control', placeholder='http://', autofocus = true, value = image_link) }}
     </div>
     <input type="submit" value="Save" class="btn btn-primary btn-lg btn-block">
     {{ form.csrf_token }}

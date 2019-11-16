@@ -4,7 +4,7 @@ from enum import Enum
 import us
 from flask_wtf import FlaskForm
 from wtforms import (DateTimeField, SelectField, SelectMultipleField,
-                     StringField, BooleanField)
+                     StringField, BooleanField, TextAreaField)
 from wtforms.validators import URL, AnyOf, DataRequired, ValidationError
 import re
 
@@ -65,7 +65,7 @@ class VenueForm(FlaskForm):
     image_link = StringField('image_link')
     facebook_link = StringField('facebook_link')
     website = StringField('website')
-    seeking_description = StringField('seeking_description')
+    seeking_description = TextAreaField('seeking_description')
 
 
 class ArtistForm(FlaskForm):
@@ -85,6 +85,6 @@ class ArtistForm(FlaskForm):
     image_link = StringField('image_link')
     facebook_link = StringField('facebook_link')
     website = StringField('website')
-    seeking_description = StringField('seeking_description')
+    seeking_description = TextAreaField('seeking_description')
 
 # TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM

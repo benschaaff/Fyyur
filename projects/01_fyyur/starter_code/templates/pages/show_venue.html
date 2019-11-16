@@ -4,6 +4,29 @@
 <div class="row">
 	<div>
 		<a href="/venues/{{ venue.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
+		<button id="delete-venue" class="btn btn-danger btn-lg">Delete</button>
+		<script>
+			const deleteButton = document.getElementById('delete-venue')
+			deleteButton.onclick = function (e) {
+				e.preventDefault();
+				fetch('/venues/{{ venue.id }}', {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				})
+					.then(function (response) {
+						return response.json();
+					})
+					.then(function (jsonResponse) {
+						window.location.href = jsonResponse.redirect;
+					})
+					.catch(function (err) {
+						console.log(err);
+						alert(err);
+					});
+			}
+		</script>
 	</div>
 	<div class="col-sm-6">
 		<h1 class="monospace">
@@ -48,7 +71,9 @@
 		{% endif %}
 	</div>
 	<div class="col-sm-6">
+		{% if venue.image_link %}
 		<img src="{{ venue.image_link }}" alt="Venue Image" />
+		{% endif %}
 	</div>
 </div>
 <section>

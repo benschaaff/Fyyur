@@ -47,8 +47,6 @@ p.lead {
  * Various other styles
  ****************************************************************************/
 
-/* Various other styles end */
-
 #front-splash {
 	width: 100%;
 }
@@ -209,3 +207,9 @@ h2.monospace {
 .subtitle {
   opacity: 0.5;
 }
+.no-border {
+  border: 0;
+  box-shadow: none;
+}
+
+/* Various other styles end */
