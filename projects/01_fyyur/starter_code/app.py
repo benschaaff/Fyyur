@@ -527,7 +527,6 @@ def shows():
 
 @app.route('/shows/create')
 def create_shows():
-    # renders form. do not touch.
     form = ShowForm()
     return render_template('forms/new_show.html', form=form)
 
@@ -593,4 +592,5 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port)
 '''
 
+# TODO: add repr to venue and artist
 # TODO: add docs, including readme
