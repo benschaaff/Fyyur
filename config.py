@@ -1,9 +1,10 @@
 import os
+
 SECRET_KEY = os.urandom(32)
 # Grabs the folder where the script runs.
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Enable debug mode.
+# Enable debug mode. Can also be set via env variable => FLASK_ENV=development
 # DEBUG = True
 
 # Connect to the database
