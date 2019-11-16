@@ -4,19 +4,12 @@ from flask_migrate import Migrate
 from flask_moment import Moment
 from typing import Dict, List
 
-#----------------------------------------------------------------------------#
-# App Config.
-#----------------------------------------------------------------------------#
-
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-#----------------------------------------------------------------------------#
-# Models.
-#----------------------------------------------------------------------------#
 
 # TODO: add repr to venue
 class Venue(db.Model):
@@ -115,10 +108,11 @@ class Show(db.Model):
         'Venue.id', ondelete='CASCADE'))
     start_time = db.Column(db.DateTime)
 
-    #TODO: learn to do multiline f string
+    # TODO: learn to do multiline f string
     def __repr__(self):
         return (
             f'<Show {self.id} \nVenue: {self.venue.name} \nArtist: {self.artist.name} \nTime: {self.start_time}>\n'
         )
+
 
 db.create_all()
