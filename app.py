@@ -18,7 +18,7 @@ import dateutil.parser
 from flask_migrate import Migrate
 from flask_moment import Moment
 from forms import *
-from models import app, Artist, Show, Venue
+from models import db, app, Artist, Show, Venue
 
 # TODO: add docs, including readme
 
