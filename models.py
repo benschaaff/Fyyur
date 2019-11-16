@@ -11,7 +11,6 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
-# TODO: add repr to venue
 class Venue(db.Model):
     __tablename__ = 'Venue'
 
@@ -54,8 +53,19 @@ class Venue(db.Model):
         shows = self.shows.filter(Show.start_time >= datetime.utcnow()).all()
         return self._format_shows(shows)
 
+    def __repr__(self):
+        return (
+            f'''
+            <Venue {self.id}
+            Name: {self.name}
+            City: {self.city}
+            State: {self.state}
+            Email: {self.email}
+            Genres: {self.genres}>
+            '''
+        )
 
-# TODO: add repr to artist
+
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -96,6 +106,18 @@ class Artist(db.Model):
     def upcoming_shows(self) -> List[Dict]:
         shows = self.shows.filter(Show.start_time >= datetime.utcnow())
         return self._format_shows(shows)
+
+    def __repr__(self):
+        return (
+            f'''
+            <Artist {self.id}
+            Name: {self.name}
+            City: {self.city}
+            State: {self.state}
+            Email: {self.email}
+            Genres: {self.genres}>
+            '''
+        )
 
 
 class Show(db.Model):
