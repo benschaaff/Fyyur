@@ -16,8 +16,6 @@ from sqlalchemy import func, or_
 from forms import *
 from models import Artist, Show, Venue, app, db
 
-# TODO: update readme
-
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
