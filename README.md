@@ -45,12 +45,12 @@ To demo the Fyyur app,
 2. Environment setup -- this will install the dependencies and setup flask to run in development mode:
   ```
   $ cd Fyyur/
-  $ bash setup.sh
+  $ source setup.sh
   ```
 
 3. Start the server:
   ```
-  $ bash run.sh
+  $ ./run.sh
   ```
 
 4. Navigate to Home page [http://localhost:5000](http://localhost:5000)
