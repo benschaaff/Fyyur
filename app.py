@@ -19,6 +19,7 @@ from flask_migrate import Migrate
 from flask_moment import Moment
 from forms import *
 
+# TODO: add docs, including readme
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -34,7 +35,7 @@ migrate = Migrate(app, db)
 # Models.
 #----------------------------------------------------------------------------#
 
-
+# TODO: add repr to venue
 class Venue(db.Model):
     __tablename__ = 'Venue'
 
@@ -78,6 +79,7 @@ class Venue(db.Model):
         return self._format_shows(shows)
 
 
+# TODO: add repr to artist
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -130,6 +132,7 @@ class Show(db.Model):
         'Venue.id', ondelete='CASCADE'))
     start_time = db.Column(db.DateTime)
 
+    #TODO: learn to do multiline f string
     def __repr__(self):
         return (
             f'<Show {self.id} \nVenue: {self.venue.name} \nArtist: {self.artist.name} \nTime: {self.start_time}>\n'
@@ -591,6 +594,3 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 '''
-
-# TODO: add repr to venue and artist
-# TODO: add docs, including readme
