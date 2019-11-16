@@ -20,7 +20,7 @@ from flask_moment import Moment
 from forms import *
 from models import db, app, Artist, Show, Venue
 
-# TODO: add docs, including readme
+# TODO: update readme and clean up all imports
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -53,6 +53,8 @@ def index():
 
 @app.route('/venues')
 def venues():
+    """Show a list all of the venues, organized by city."""
+
     shows_by_city = {}
 
     upcoming_shows = Show.query.filter(
@@ -87,6 +89,8 @@ def venues():
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
+    """Show a list of the venues that contain the search term."""
+
     search_term = request.form.get('search_term', '')
     venues = Venue.query.filter(Venue.name.ilike(f'%{search_term}%'))
     data = [
@@ -103,11 +107,15 @@ def search_venues():
         "data": data
     }
 
-    return render_template('pages/search_venues.html', results=response, search_term=search_term)
+    return render_template(
+        'pages/search_venues.html', results=response, search_term=search_term
+    )
 
 
 @app.route('/venues/<int:venue_id>', methods=['GET'])
 def show_venue(venue_id):
+    """Show details for the venue with the given id."""
+
     venue = Venue.query.get(venue_id)
     if venue:
         past_shows = venue.past_shows
@@ -141,6 +149,8 @@ def show_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
+    """ Delete a venue by its id."""
+
     venue = Venue.query.get(venue_id)
     try:
         db.session.delete(venue)
@@ -155,6 +165,8 @@ def delete_venue(venue_id):
 
 @app.route('/venues/create', methods=['GET', 'POST'])
 def create_venue():
+    """Either load the blank form or submit a filled form to create a new venue."""
+
     form = VenueForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -188,6 +200,10 @@ def create_venue():
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
+    """
+    Load the form to edit an existing venue. Pre-populated with the current values loaded from the db.
+    """
+
     venue = Venue.query.get(venue_id)
     form = VenueForm()
 
@@ -212,6 +228,8 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
+     """Update the venue info using the form."""
+
     venue = Venue.query.get(venue_id)
     form = VenueForm(request.form)
     try:
@@ -244,6 +262,7 @@ def edit_venue_submission(venue_id):
 
 @app.route('/artists')
 def artists():
+    """Show a list all of the artists."""
 
     data = [
         {
@@ -258,6 +277,8 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
+    """Show a list of the artists that contain the search term."""
+
     search_term = request.form.get('search_term', '')
     artists = Artist.query.filter(Artist.name.ilike(f'%{search_term}%'))
 
@@ -280,6 +301,8 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
+    """Show details for the artist with the given id."""
+
     artist = Artist.query.get(artist_id)
     if artist:
         past_shows = artist.past_shows
@@ -309,6 +332,11 @@ def show_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['GET', 'POST'])
 def edit_artist(artist_id):
+    """
+    Edit an existing artist. GET to load the preexisting data and POST to
+    save the new data entered by the user.
+    """
+
     artist = Artist.query.get(artist_id)
     if artist:
         if request.method == 'GET':
@@ -359,6 +387,8 @@ def edit_artist(artist_id):
 
 @app.route('/artists/create', methods=['GET', 'POST'])
 def create_artist():
+    """Either load the blank form or submit a filled form to create a new artist."""
+
     form = ArtistForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -415,12 +445,16 @@ def shows():
 
 @app.route('/shows/create')
 def create_shows():
+    """Load the empty form to add a new show."""
+
     form = ShowForm()
     return render_template('forms/new_show.html', form=form)
 
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
+    """Submit the form to add a new show."""
+
     form = request.form
 
     show = Show(artist_id=form['artist_id'],
