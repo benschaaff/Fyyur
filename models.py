@@ -108,10 +108,14 @@ class Show(db.Model):
         'Venue.id', ondelete='CASCADE'))
     start_time = db.Column(db.DateTime)
 
-    # TODO: learn to do multiline f string
     def __repr__(self):
         return (
-            f'<Show {self.id} \nVenue: {self.venue.name} \nArtist: {self.artist.name} \nTime: {self.start_time}>\n'
+            f'''
+            <Show {self.id}
+            Venue: {self.venue.name}
+            Artist: {self.artist.name}
+            Time: {self.start_time}>
+            '''
         )
 
 
