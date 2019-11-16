@@ -86,5 +86,3 @@ class ArtistForm(FlaskForm):
     facebook_link = StringField('facebook_link')
     website = StringField('website')
     seeking_description = TextAreaField('seeking_description')
-
-# TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM

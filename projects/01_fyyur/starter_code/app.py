@@ -393,7 +393,6 @@ def show_artist(artist_id):
     if artist:
         past_shows = artist.past_shows
         upcoming_shows = artist.upcoming_shows
-
         data = {
             "id": artist_id,
             "name": artist.name,
@@ -412,68 +411,59 @@ def show_artist(artist_id):
             "upcoming_shows_count": len(upcoming_shows),
             "email": artist.email
         }
-
         return render_template('pages/show_artist.html', artist=data)
-    abort(404)
+    else:
+        abort(404)
 
-#  Update
-#  ----------------------------------------------------------------
 
-# TODO(ben): combine the edit artist functions into a single function
-@app.route('/artists/<int:artist_id>/edit', methods=['GET'])
+@app.route('/artists/<int:artist_id>/edit', methods=['GET', 'POST'])
 def edit_artist(artist_id):
     artist = Artist.query.get(artist_id)
-    form = ArtistForm()
+    if artist:
+        if request.method == 'GET':
+            form = ArtistForm()
+            data = {
+                "id": artist.id,
+                "name": artist.name,
+                "genres": json.loads(artist.genres),
+                "city": artist.city,
+                "state": artist.state,
+                "phone": artist.phone,
+                "website": artist.website,
+                "facebook_link": artist.facebook_link,
+                "seeking_venue": artist.seeking_venue,
+                "seeking_description": artist.seeking_description,
+                "image_link": artist.image_link,
+                "email": artist.email
+            }
+            return render_template('forms/edit_artist.html', form=form, artist=data)
+        elif request.method == 'POST':
+            form = ArtistForm(request.form)
+            try:
+                artist.name = form.name.data
+                artist.genres = json.dumps(form.genres.data)
+                artist.city = form.city.data
+                artist.state = form.state.data
+                artist.phone = form.phone.data
+                artist.website = form.website.data
+                artist.facebook_link = form.facebook_link.data
+                artist.seeking_venue = form.seeking_venue.data
+                artist.seeking_description = form.seeking_description.data
+                artist.image_link = form.image_link.data
+                artist.email = form.email.data
 
-    data = {
-        "id": artist.id,
-        "name": artist.name,
-        "genres": json.loads(artist.genres),
-        "city": artist.city,
-        "state": artist.state,
-        "phone": artist.phone,
-        "website": artist.website,
-        "facebook_link": artist.facebook_link,
-        "seeking_venue": artist.seeking_venue,
-        "seeking_description": artist.seeking_description,
-        "image_link": artist.image_link,
-        "email": artist.email
-    }
+                db.session.commit()
+                message = f'Artist ID {artist.id} was updated!', 'info'
+            except Exception as e:
+                app.logger.error(e)
+                db.session.rollback()
+                message = f'An error occurred. Changes not saved :(', 'danger'
 
-    return render_template('forms/edit_artist.html', form=form, artist=data)
+            flash(*message)
 
-
-@app.route('/artists/<int:artist_id>/edit', methods=['POST'])
-def edit_artist_submission(artist_id):
-    artist = Artist.query.get(artist_id)
-    form = ArtistForm(request.form)
-    try:
-        artist.name = form.name.data
-        artist.genres = json.dumps(form.genres.data)
-        artist.city = form.city.data
-        artist.state = form.state.data
-        artist.phone = form.phone.data
-        artist.website = form.website.data
-        artist.facebook_link = form.facebook_link.data
-        artist.seeking_venue = form.seeking_venue.data
-        artist.seeking_description = form.seeking_description.data
-        artist.image_link = form.image_link.data
-        artist.email = form.email.data
-
-        db.session.commit()
-        message = f'Artist ID {artist.id} was updated!', 'info'
-    except Exception as e:
-        app.logger.error(e)
-        db.session.rollback()
-        message = f'An error occurred. Changes not saved :(', 'danger'
-
-    flash(*message)
-
-    return redirect(url_for('show_artist', artist_id=artist_id))
-
-
-#  Create Artist
-#  ----------------------------------------------------------------
+            return redirect(url_for('show_artist', artist_id=artist_id))
+    else:
+        abort(404)
 
 
 @app.route('/artists/create', methods=['GET', 'POST'])
@@ -599,3 +589,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 '''
+
+
+# TODO: add the db constraints for email, etc.
+# TODO: add docs, including readme
