@@ -558,7 +558,7 @@ def create_show_submission():
 
     flash(*message)
 
-    return render_template('pages/home.html')
+    return redirect(url_for('index'))
 
 
 #  Error Handlers
