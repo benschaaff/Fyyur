@@ -91,7 +91,7 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String)
-    website = website = db.Column(db.String(120))
+    website = db.Column(db.String(120))
     email = db.Column(db.String(120), nullable=False)
 
     shows = db.relationship('Show', backref='artist', lazy='dynamic',
@@ -593,6 +593,4 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port)
 '''
 
-
-# TODO: add the db constraints for email, etc.
 # TODO: add docs, including readme
